@@ -10,6 +10,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String _expression = ''; //stores the mathematical expression
   String _result = ''; //stores the answer
+  int maxExpressionLength = 20;//define the maximum characters on the expression
 
   Widget calcbutton(String btnText, Color btnColor, Color textColor){
     // ignore: sized_box_for_whitespace
@@ -43,6 +44,7 @@ class _HomePageState extends State<HomePage> {
       if(btnText == 'C'){//making the clear button functional on pressed
         _expression= '';
         _result=' ';
+       
       }
       else if(btnText == '='){//making the equal sign able to calculate on pressed
         _calculateResult();
@@ -53,8 +55,54 @@ class _HomePageState extends State<HomePage> {
       else if(btnText == '()'){
         _addWhichParenthesis();
       }
+
       else{//whatever will be pressed will be displayed
-        _expression += btnText;
+        if(_expression.length + btnText.length <= maxExpressionLength){
+          _expression += btnText;
+        }
+        else{
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                "Can't enter more than 20 characters!",
+                textAlign: TextAlign.center,
+                ),
+              // backgroundColor: Colors.red,
+              duration: const Duration(seconds: 2),
+              // width: 200,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              elevation: 10.0,
+              behavior: SnackBarBehavior.floating,
+              //width: MediaQuery.of(context).size.width * 0.7, // 80% of the screen width
+              
+            ),
+          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     content: Builder(
+          //       builder: (context) => Container(
+          //         width: MediaQuery.of(context).size.width * 0.8, // 80% of the screen width
+          //         child: const Text(
+          //           "Can't enter more than 20 characters!",
+          //           textAlign: TextAlign.center,
+          //           style: TextStyle(
+          //             fontSize:15,
+          //           ),
+                    
+          //         ),
+          //       ),
+          //     ),
+          //     duration: const Duration(seconds: 2),
+          //     behavior: SnackBarBehavior.floating,
+          //     shape: RoundedRectangleBorder(
+          //       borderRadius: BorderRadius.circular(24),
+          //     ),
+          //     elevation: 6.0,
+          //   ),
+          // );          
+        }
       }      
     });
   }
@@ -65,7 +113,7 @@ class _HomePageState extends State<HomePage> {
       Parser p = Parser();//to convert text into a mathematical expression
       Expression exp = p.parse(_expression.replaceAll('x', '*').replaceAll('÷', '/'));//It replaces 'x' with '*' and '÷' with '/' to match Dart's arithmetic operators
       ContextModel cm =ContextModel();//This provides a mathematical context of the parsed text
-      num eval = exp.evaluate(EvaluationType.REAL, cm);// Evaluate the expression in the context of real numbers
+      double eval = exp.evaluate(EvaluationType.REAL, cm);// Evaluate the expression in the context of real numbers
       _result = eval.toString();
 
     } catch (e) {
@@ -93,6 +141,14 @@ class _HomePageState extends State<HomePage> {
        _expression += ')';
     }
   }
+
+    void _backspace() {
+      setState(() {
+        if(_expression.isNotEmpty){
+          _expression = _expression.substring(0, _expression.length - 1);
+        }
+      });
+    }
   
 
 
@@ -148,7 +204,33 @@ class _HomePageState extends State<HomePage> {
                       ),
                     )
                   ],
-                ),                
+                ),
+
+                 Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: IconButton(
+                        onPressed: () {
+                          _backspace();
+                        }, 
+                        icon: const Icon(Icons.cancel_outlined, color: Colors.red,)
+                        ),
+                    )
+                  ],
+                ),
+
+                const Divider(
+                  color: Colors.white,
+                  thickness: 0.5,
+                  height: 10,
+                  indent: 20,
+                  endIndent: 20,
+                ),
+
+                const SizedBox(height: 10,),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   //here the first row of buttons
@@ -159,6 +241,7 @@ class _HomePageState extends State<HomePage> {
                     calcbutton('÷',Colors.white10,Colors.green),
                   ],
                 ),
+
                 const SizedBox(height: 10,),
                     
                 Row(
@@ -219,6 +302,8 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+  
+
   
   
 }
