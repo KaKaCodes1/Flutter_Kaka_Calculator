@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           //   end:Alignment.bottomLeft,
           //   )
             gradient: RadialGradient(
-              colors: [ Colors.black, Color.fromARGB(255, 212, 176, 78),],
+              colors: [ Colors.black, Color.fromARGB(255, 13, 109, 15),],
               radius: 0.75,
             )
         ),

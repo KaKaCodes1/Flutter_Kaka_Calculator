@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kaka_calculator/screens/home_page.dart';
+//import 'package:kaka_calculator/screens/home_page.dart';
 import 'package:kaka_calculator/screens/splash_screen.dart';
 
 void main() {
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         //colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 215, 185, 151)),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: const SplashScreen(),
     );
   }
 }
