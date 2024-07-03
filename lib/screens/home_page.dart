@@ -15,8 +15,8 @@ class _HomePageState extends State<HomePage> {
   Widget calcbutton(String btnText, Color btnColor, Color textColor){
     // ignore: sized_box_for_whitespace
     return Container(
-      height: 75,
-      width: 75,
+      height: 85,
+      width: 85,
       child: ElevatedButton(
         onPressed: () {
           _onButtonPressed(btnText);
@@ -31,13 +31,17 @@ class _HomePageState extends State<HomePage> {
           textAlign: TextAlign.center,
           style: TextStyle(
             color: textColor,
-            fontSize: 25,
+            fontSize: 29,
           ),
           ),
       
         ),
     );
   }
+
+  //This will be used to display the history on a modal bottom sheet
+  Widget displayHistory() => Container();
+
   //creating the functionality of the buttons
   void _onButtonPressed(String btnText){
     setState(() {
@@ -56,7 +60,8 @@ class _HomePageState extends State<HomePage> {
         _addWhichParenthesis();
       }
 
-      else{//whatever will be pressed will be displayed
+      //whatever will be pressed will be displayed
+      else{
         if(_expression.length + btnText.length <= maxExpressionLength){
           _expression += btnText;
         }
@@ -78,30 +83,7 @@ class _HomePageState extends State<HomePage> {
               //width: MediaQuery.of(context).size.width * 0.7, // 80% of the screen width
               
             ),
-          );
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //     content: Builder(
-          //       builder: (context) => Container(
-          //         width: MediaQuery.of(context).size.width * 0.8, // 80% of the screen width
-          //         child: const Text(
-          //           "Can't enter more than 20 characters!",
-          //           textAlign: TextAlign.center,
-          //           style: TextStyle(
-          //             fontSize:15,
-          //           ),
-                    
-          //         ),
-          //       ),
-          //     ),
-          //     duration: const Duration(seconds: 2),
-          //     behavior: SnackBarBehavior.floating,
-          //     shape: RoundedRectangleBorder(
-          //       borderRadius: BorderRadius.circular(24),
-          //     ),
-          //     elevation: 6.0,
-          //   ),
-          // );          
+          );         
         }
       }      
     });
@@ -111,9 +93,9 @@ class _HomePageState extends State<HomePage> {
   void _calculateResult(){
     try {
       Parser p = Parser();//to convert text into a mathematical expression
-      Expression exp = p.parse(_expression.replaceAll('x', '*').replaceAll('÷', '/'));//It replaces 'x' with '*' and '÷' with '/' to match Dart's arithmetic operators
+      Expression exp = p.parse(_expression.replaceAll('x', '*').replaceAll('÷', '/').replaceAll('−', '-'));//It replaces 'x' with '*' and '÷' with '/' to match Dart's arithmetic operators
       ContextModel cm =ContextModel();//This provides a mathematical context of the parsed text
-      double eval = exp.evaluate(EvaluationType.REAL, cm);// Evaluate the expression in the context of real numbers
+      num eval = exp.evaluate(EvaluationType.REAL, cm);// Evaluate the expression in the context of real numbers
       _result = eval.toString();
 
     } catch (e) {
@@ -134,10 +116,27 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _addWhichParenthesis() {
-    if (_expression.isEmpty || _expression.endsWith('+') || _expression.endsWith('-') || _expression.endsWith('x') || _expression.endsWith('÷') || _expression.endsWith('%')){
+    if (_expression.isEmpty || 
+    _expression.endsWith('+') || 
+    _expression.endsWith('−') || 
+    _expression.endsWith('x') || 
+    _expression.endsWith('÷') || 
+    _expression.endsWith('%')){
       _expression += '(';
     }
-    else if (_expression.endsWith('(') || _expression.endsWith(')') || _expression.endsWith('.') || _expression.endsWith('0') || _expression.endsWith('1') || _expression.endsWith('2') || _expression.endsWith('3') || _expression.endsWith('4') || _expression.endsWith('5') || _expression.endsWith('6') || _expression.endsWith('7') || _expression.endsWith('8') || _expression.endsWith('9')) {
+    else if (_expression.endsWith('(') ||
+     _expression.endsWith(')') || 
+     _expression.endsWith('.') || 
+     _expression.endsWith('0') || 
+     _expression.endsWith('1') || 
+     _expression.endsWith('2') || 
+     _expression.endsWith('3') || 
+     _expression.endsWith('4') || 
+     _expression.endsWith('5') || 
+     _expression.endsWith('6') || 
+     _expression.endsWith('7') || 
+     _expression.endsWith('8') || 
+     _expression.endsWith('9')) {
        _expression += ')';
     }
   }
@@ -149,10 +148,6 @@ class _HomePageState extends State<HomePage> {
         }
       });
     }
-  
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -160,22 +155,53 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.black,
       body: SafeArea(
         bottom: false,//prevent this safearea from affecting bottom nav for android
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                //this where the expression will appear
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
+                Image.asset(
+                  'Assets/images/calclogo-removebg-preview.png',
+                  width: 80,
+                  height: 80,
+                ),
+              ],
+            ),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  //this where the expression will appear
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            _expression,
+                            textAlign: TextAlign.left,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+
+                  const SizedBox(height: 10,),
+                          
+                   Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
                         child: Text(
-                          _expression,
+                          _result,
                           textAlign: TextAlign.left,
                           style: const TextStyle(
                             color: Colors.white,
@@ -183,121 +209,122 @@ class _HomePageState extends State<HomePage> {
                             fontWeight: FontWeight.bold
                           ),
                         ),
+                      )
+                    ],
+                  ),
+                          
+                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: IconButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context, 
+                              builder: (context)=> displayHistory());
+                          }, 
+                          icon: const Icon(Icons.history, color: Colors.green,)
+                          ),
                       ),
-                    )
-                  ],
-                ),
 
-                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Text(
-                        _result,
-                        textAlign: TextAlign.left,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold
-                        ),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: IconButton(
+                          onPressed: () {
+                            _backspace();
+                          }, 
+                          icon: const Icon(Icons.cancel_outlined, color: Colors.red,)
+                          ),
+                      ), 
+                     
+                    ],
+                  ),
+                  
+                          
+                  const Divider(
+                    color: Colors.white,
+                    thickness: 0.5,
+                    height: 10,
+                    indent: 20,
+                    endIndent: 20,
+                  ),
+                          
+                  const SizedBox(height: 10,),
+                          
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        //here the first row of buttons
+                        children: [
+                          calcbutton('C',Colors.white10,Colors.red),
+                          calcbutton('+/-',Colors.white10,Colors.green),
+                          calcbutton('%',Colors.white10,Colors.green),
+                          calcbutton('÷',Colors.white10,Colors.green),
+                        ],
                       ),
-                    )
-                  ],
-                ),
-
-                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: IconButton(
-                        onPressed: () {
-                          _backspace();
-                        }, 
-                        icon: const Icon(Icons.cancel_outlined, color: Colors.red,)
-                        ),
-                    )
-                  ],
-                ),
-
-                const Divider(
-                  color: Colors.white,
-                  thickness: 0.5,
-                  height: 10,
-                  indent: 20,
-                  endIndent: 20,
-                ),
-
-                const SizedBox(height: 10,),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //here the first row of buttons
-                  children: [
-                    calcbutton('C',Colors.white10,Colors.red),
-                    calcbutton('+/-',Colors.white10,Colors.green),
-                    calcbutton('%',Colors.white10,Colors.green),
-                    calcbutton('÷',Colors.white10,Colors.green),
-                  ],
-                ),
-
-                const SizedBox(height: 10,),
-                    
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //here the first row of buttons
-                  children: [
-                    calcbutton('7',Colors.white10,Colors.white),
-                    calcbutton('8',Colors.white10,Colors.white),
-                    calcbutton('9',Colors.white10,Colors.white),
-                    calcbutton('x',Colors.white10,Colors.green),
-                  ],
-                ), 
-                    
-                const SizedBox(height: 10,),  
-                    
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //here the first row of buttons
-                  children: [
-                    calcbutton('4',Colors.white10,Colors.white),
-                    calcbutton('5',Colors.white10,Colors.white),
-                    calcbutton('6',Colors.white10,Colors.white),
-                    calcbutton('-',Colors.white10,Colors.green),
-                  ],
-                ), 
-                    
-                const SizedBox(height: 10,),
-                    
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //here the first row of buttons
-                  children: [
-                    calcbutton('1',Colors.white10,Colors.white),
-                    calcbutton('2',Colors.white10,Colors.white),
-                    calcbutton('3',Colors.white10,Colors.white),
-                    calcbutton('+',Colors.white10,Colors.green),
-                  ],
-                ), 
-                    
-                const SizedBox(height: 10,),
-                    
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //here the first row of buttons
-                  children: [
-                    calcbutton('()',Colors.white10,Colors.white),
-                    calcbutton('0',Colors.white10,Colors.white),
-                    calcbutton('.',Colors.white10,Colors.white),
-                    calcbutton('=',Colors.white10,Colors.green),
-                  ],
-                ), 
-                    
-                const SizedBox(height: 10,),                                                     
-              ],
+                    ],
+                  ),
+                          
+                  const SizedBox(height: 15,),
+                      
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    //here the first row of buttons
+                    children: [
+                      calcbutton('7',Colors.white10,Colors.white),
+                      calcbutton('8',Colors.white10,Colors.white),
+                      calcbutton('9',Colors.white10,Colors.white),
+                      calcbutton('x',Colors.white10,Colors.green),
+                    ],
+                  ), 
+                      
+                  const SizedBox(height: 10,),  
+                      
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    //here the first row of buttons
+                    children: [
+                      calcbutton('4',Colors.white10,Colors.white),
+                      calcbutton('5',Colors.white10,Colors.white),
+                      calcbutton('6',Colors.white10,Colors.white),
+                      calcbutton('−',Colors.white10,Colors.green),
+                    ],
+                  ), 
+                      
+                  const SizedBox(height: 10,),
+                      
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    //here the first row of buttons
+                    children: [
+                      calcbutton('1',Colors.white10,Colors.white),
+                      calcbutton('2',Colors.white10,Colors.white),
+                      calcbutton('3',Colors.white10,Colors.white),
+                      calcbutton('+',Colors.white10,Colors.green),
+                    ],
+                  ), 
+                      
+                  const SizedBox(height: 10,),
+                      
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    //here the first row of buttons
+                    children: [
+                      calcbutton('()',Colors.white10,Colors.white),
+                      calcbutton('0',Colors.white10,Colors.white),
+                      calcbutton('.',Colors.white10,Colors.white),
+                      calcbutton('=',Colors.white10,Colors.green),
+                    ],
+                  ), 
+                      
+                  const SizedBox(height: 10,),                                                     
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
