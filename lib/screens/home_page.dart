@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:math_expressions/math_expressions.dart';//to enable parsing and evaluting 
+import 'package:math_expressions/math_expressions.dart';
+import 'package:shared_preferences/shared_preferences.dart';//to enable parsing and evaluting 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -10,7 +11,30 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String _expression = ''; //stores the mathematical expression
   String _result = ''; //stores the answer
-  int maxExpressionLength = 20;//define the maximum characters on the expression
+  int maxExpressionLength = 20; //define the maximum characters on the expression
+  List<String> _historyExpression =[]; //Holds a list of the history of the calculator
+  List<String> _historyResult =[]; //Holds a list of the history of the calculator
+
+  @override
+  void initState(){//This ensures that the history is retained even after the app is closed and reopened.
+    super.initState();
+    _loadHistory();
+  }
+
+  void _saveHistory() async {//This method is called whenever a new result is calculated and added to the history.
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('historyExpression', _historyExpression);
+    prefs.setStringList('historyResult', _historyResult);
+  }
+
+  void _loadHistory() async {//This method is called in initState to initialize the history list when the app starts.
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _historyExpression = prefs.getStringList('historyExpression') ?? [];
+      _historyResult = prefs.getStringList('historyResult') ?? [];
+
+    });
+  }
 
   Widget calcbutton(String btnText, Color btnColor, Color textColor){
     // ignore: sized_box_for_whitespace
@@ -40,7 +64,26 @@ class _HomePageState extends State<HomePage> {
   }
 
   //This will be used to display the history on a modal bottom sheet
-  Widget displayHistory() => Container();
+  // void _displayHistory() {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     builder: (context) {
+  //       return Container(
+  //         color: Colors.white10,
+  //         child: ListView.builder(
+  //           itemCount: _history.length,
+  //           itemBuilder: (context, index){
+  //             return Padding(
+  //               padding: const EdgeInsets.all(8.0),
+  //               child: Text(
+  //                 _history[index],
+  //                 style: const TextStyle(color: Colors.white),
+  //               ),)
+  //           }
+  //           ),
+  //       )
+  //     },);
+  //   } 
 
   //creating the functionality of the buttons
   void _onButtonPressed(String btnText){
@@ -97,6 +140,9 @@ class _HomePageState extends State<HomePage> {
       ContextModel cm =ContextModel();//This provides a mathematical context of the parsed text
       num eval = exp.evaluate(EvaluationType.REAL, cm);// Evaluate the expression in the context of real numbers
       _result = eval.toString();
+      _historyExpression.add(_expression);
+      _historyResult.add(_result);
+      _saveHistory();
 
     } catch (e) {
       _result = 'Error';
@@ -148,6 +194,11 @@ class _HomePageState extends State<HomePage> {
         }
       });
     }
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -221,8 +272,77 @@ class _HomePageState extends State<HomePage> {
                         child: IconButton(
                           onPressed: () {
                             showModalBottomSheet(
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(8)
+                                )
+                              ),
                               context: context, 
-                              builder: (context)=> displayHistory());
+                              builder: (context)=>
+                                  ListView.builder(
+                                    itemCount: _historyExpression.length, 
+                                    //itemCount:_historyResult.length,
+                                    itemBuilder: (context, index){
+                                      return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      color: Colors.grey),
+                                    
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          if(_expression.isEmpty){
+                                            _expression=_historyResult[index];
+                                          }
+                                        });
+                                      },
+                                      child: ListTile(
+                                        // tileColor: Colors.grey,
+                                        title: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              _historyExpression[index],
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 23,
+                                                ),
+                                            ),
+                                          ],
+                                        ),
+                                        subtitle: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              _historyResult[index],
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 25,                                                
+                                      
+                                                ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  );
+                                  }
+                                  ),
+                                                                    // const SizedBox(
+                                  //   height: 10,
+                                  // ),
+
+                                  // Row(
+                                  //   children: [
+                                  //     IconButton(onPressed: () {}, icon: const Icon(Icons.delete))
+                                  //   ],
+                                  // )
+                              );
                           }, 
                           icon: const Icon(Icons.history, color: Colors.green,)
                           ),
