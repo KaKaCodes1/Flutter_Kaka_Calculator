@@ -103,6 +103,9 @@ class _HomePageState extends State<HomePage> {
       else if(btnText == '()'){
         _addWhichParenthesis();
       }
+      else if(btnText == '%'){
+        _calculatePercentage();
+      }
 
       //whatever will be pressed will be displayed
       else{
@@ -132,6 +135,22 @@ class _HomePageState extends State<HomePage> {
       }      
     });
   }
+
+    void _calculatePercentage() {
+      if(_expression.isNotEmpty){
+        try {
+          Parser p = Parser();//to convert text into a mathematical expression
+          Expression exp = p.parse(_expression.replaceAll('x', '*').replaceAll('÷', '/').replaceAll('−', '-'));//It replaces 'x' with '*' and '÷' with '/' to match Dart's arithmetic operators
+          ContextModel cm =ContextModel();//This provides a mathematical context of the parsed text
+          num eval = exp.evaluate(EvaluationType.REAL, cm);// Evaluate the expression in the context of real numbers
+          eval= eval/100;//this will be responsible for dividing by 100
+          _expression = eval.toString();
+          
+        } catch (e) {
+          _result = 'Error';
+        }
+      }
+    }
 
   //This method evaluates the expression to provide the result using math_expressions package
   void _calculateResult(){
@@ -229,9 +248,13 @@ class _HomePageState extends State<HomePage> {
                           setState(() {
                             if(_expression.isEmpty){
                               _expression=_historyResult[index];
+                              Navigator.of(context).pop();
+                            }
+                            else{
+                              Navigator.of(context).pop();      
                             }
                           });
-                          Navigator.of(context).pop();
+
                         },
                         child: ListTile(
                           title: Row(
@@ -274,7 +297,7 @@ class _HomePageState extends State<HomePage> {
                 child: FloatingActionButton(
                   onPressed: _clearHistory,
                   backgroundColor: Colors.red,                  
-                  child: const Icon(Icons.delete, color: Colors.black,size: 40,),
+                  child: const Icon(Icons.delete, color: Colors.black,size: 30,),
                   ),
                 ),
 
@@ -533,8 +556,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-  
-
   
   
 }
