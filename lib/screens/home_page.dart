@@ -95,6 +95,7 @@ class _HomePageState extends State<HomePage> {
       }
       else if(btnText == '='){//making the equal sign able to calculate on pressed
         _calculateResult();
+
       }
       else if(btnText == '+/-'){//it toggles the sign of the current expression.
         _changeSign();
@@ -195,6 +196,94 @@ class _HomePageState extends State<HomePage> {
       });
     }
 
+    void _clearHistory() async {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _historyExpression.clear();
+        _historyResult.clear();
+      });
+      prefs.remove('historyExpression');
+      prefs.remove('historyResult');
+      Navigator.of(context).pop();
+    }
+
+    void _displayHistory(){
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.black, 
+        builder: (context){
+          return Stack(
+            children: [
+              ListView.builder(
+                itemCount: _historyExpression.length,
+                itemBuilder: (context, index){
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.white10
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if(_expression.isEmpty){
+                              _expression=_historyResult[index];
+                            }
+                          });
+                          Navigator.of(context).pop();
+                        },
+                        child: ListTile(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                _historyExpression[index],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 23,
+                                  ),
+                              ),
+                            ],
+                          ),
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                _historyResult[index],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25,                                                
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                    
+                }
+              ),
+
+              Positioned(
+                left: 16,
+                bottom: 16,
+                child: FloatingActionButton(
+                  onPressed: _clearHistory,
+                  backgroundColor: Colors.red,                  
+                  child: const Icon(Icons.delete, color: Colors.black,size: 40,),
+                  ),
+                ),
+
+            ],
+          );
+        }
+        );
+    }
+
 
 
 
@@ -271,78 +360,73 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.all(10.0),
                         child: IconButton(
                           onPressed: () {
-                            showModalBottomSheet(
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(8)
-                                )
-                              ),
-                              context: context, 
-                              builder: (context)=>
-                                  ListView.builder(
-                                    itemCount: _historyExpression.length, 
-                                    //itemCount:_historyResult.length,
-                                    itemBuilder: (context, index){
-                                      return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      color: Colors.grey),
+                            // showModalBottomSheet(
+                            //   shape: const RoundedRectangleBorder(
+                            //     borderRadius: BorderRadius.vertical(
+                            //       top: Radius.circular(8)
+                            //     )
+                            //   ),
+                            //   context: context, 
+                            //   builder: (context)=>
+                            //       ListView.builder(
+                            //         itemCount: _historyExpression.length, 
+                            //         //itemCount:_historyResult.length,
+                            //         itemBuilder: (context, index){
+                            //           return Padding(
+                            //       padding: const EdgeInsets.all(8.0),
+                            //       child: Container(
+                            //         decoration: BoxDecoration(
+                            //           borderRadius: BorderRadius.circular(8),
+                            //           color: Colors.grey),
                                     
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          if(_expression.isEmpty){
-                                            _expression=_historyResult[index];
-                                          }
-                                        });
-                                      },
-                                      child: ListTile(
-                                        // tileColor: Colors.grey,
-                                        title: Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              _historyExpression[index],
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 23,
-                                                ),
-                                            ),
-                                          ],
-                                        ),
-                                        subtitle: Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              _historyResult[index],
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 25,                                                
+                            //         child: GestureDetector(
+                            //           onTap: () {
+                            //             setState(() {
+                            //               if(_expression.isEmpty){
+                            //                 _expression=_historyResult[index];
+                            //               }
+                            //             });
+                            //             Navigator.of(context).pop();
+                            //           },
+                            //           child: ListTile(
+                            //             // tileColor: Colors.grey,
+                            //             title: Row(
+                            //               mainAxisAlignment: MainAxisAlignment.end,
+                            //               children: [
+                            //                 Text(
+                            //                   _historyExpression[index],
+                            //                   style: const TextStyle(
+                            //                     color: Colors.black,
+                            //                     fontWeight: FontWeight.w500,
+                            //                     fontSize: 23,
+                            //                     ),
+                            //                 ),
+                            //               ],
+                            //             ),
+                            //             subtitle: Row(
+                            //               mainAxisAlignment: MainAxisAlignment.end,
+                            //               children: [
+                            //                 Text(
+                            //                   _historyResult[index],
+                            //                   style: const TextStyle(
+                            //                     color: Colors.black,
+                            //                     fontWeight: FontWeight.bold,
+                            //                     fontSize: 25,                                                
                                       
-                                                ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  );
-                                  }
-                                  ),
-                                                                    // const SizedBox(
-                                  //   height: 10,
-                                  // ),
+                            //                     ),
+                            //                 ),
+                            //               ],
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //       );
+                            //       }
+                            //       ),
 
-                                  // Row(
-                                  //   children: [
-                                  //     IconButton(onPressed: () {}, icon: const Icon(Icons.delete))
-                                  //   ],
-                                  // )
-                              );
+                              // );
+                          
+                            _displayHistory();
                           }, 
                           icon: const Icon(Icons.history, color: Colors.green,)
                           ),
