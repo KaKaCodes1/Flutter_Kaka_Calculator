@@ -14,6 +14,7 @@ class _HomePageState extends State<HomePage> {
   int maxExpressionLength = 20; //define the maximum characters on the expression
   List<String> _historyExpression =[]; //Holds a list of the history of the calculator
   List<String> _historyResult =[]; //Holds a list of the history of the calculator
+  bool _isCalculationComplete = false; //This will track whether the calculation is complete
 
   @override
   void initState(){//This ensures that the history is retained even after the app is closed and reopened.
@@ -63,27 +64,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  //This will be used to display the history on a modal bottom sheet
-  // void _displayHistory() {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     builder: (context) {
-  //       return Container(
-  //         color: Colors.white10,
-  //         child: ListView.builder(
-  //           itemCount: _history.length,
-  //           itemBuilder: (context, index){
-  //             return Padding(
-  //               padding: const EdgeInsets.all(8.0),
-  //               child: Text(
-  //                 _history[index],
-  //                 style: const TextStyle(color: Colors.white),
-  //               ),)
-  //           }
-  //           ),
-  //       )
-  //     },);
-  //   } 
 
   //creating the functionality of the buttons
   void _onButtonPressed(String btnText){
@@ -91,7 +71,7 @@ class _HomePageState extends State<HomePage> {
       if(btnText == 'C'){//making the clear button functional on pressed
         _expression= '';
         _result=' ';
-       
+       _isCalculationComplete=false;
       }
       else if(btnText == '='){//making the equal sign able to calculate on pressed
         _calculateResult();
@@ -107,8 +87,14 @@ class _HomePageState extends State<HomePage> {
         _calculatePercentage();
       }
 
-      //whatever will be pressed will be displayed
+      //whatever will be pressed will be displayed if it has not passed the maxExpressionLength
       else{
+        if(_isCalculationComplete && (btnText == '+' || btnText == '−' || btnText == 'x' || btnText == '÷')){//this is the section that checks if calculation is done and the result is taken to make the beginning of another expression once the math symbols(+,-,x or ÷) are tapped
+          _expression = _result + btnText;
+          _result = '';
+          _isCalculationComplete = false; 
+        }
+        else{
         if(_expression.length + btnText.length <= maxExpressionLength){
           _expression += btnText;
         }
@@ -132,10 +118,11 @@ class _HomePageState extends State<HomePage> {
             ),
           );         
         }
+      }
       }      
     });
   }
-
+    //Making the % button functional
     void _calculatePercentage() {
       if(_expression.isNotEmpty){
         try {
@@ -163,7 +150,7 @@ class _HomePageState extends State<HomePage> {
       _historyExpression.add(_expression);
       _historyResult.add(_result);
       _saveHistory();
-
+      _isCalculationComplete = true; //Calculation is complete
     } catch (e) {
       _result = 'Error';
     }
@@ -338,17 +325,20 @@ class _HomePageState extends State<HomePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Text(
-                            _expression,
-                            textAlign: TextAlign.left,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            reverse: true,
+                            child: Text(
+                              _expression,
+                              textAlign: TextAlign.left,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold
+                              ),
                             ),
                           ),
                         ),
